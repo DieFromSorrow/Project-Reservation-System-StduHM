@@ -1,0 +1,51 @@
+/* Custom Styles */
+body {
+    background-color: #f8f8f8; /* 更柔和的背景色 */
+}
+
+.container {
+    background-color: #fff;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    color: #3498db;
+}
+
+table {
+    background-color: #fff;
+    width: 100%;
+    table-layout: unset;
+}
+
+th {
+    background-color: #3498db;
+    color: #fff;
+}
+
+tbody tr {
+    background-color: #f9f9f9; /* 更柔和的背景色 */
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+td {
+    white-space: nowrap; /* 防止数据过长换行 */
+    overflow: hidden;
+    text-overflow: ellipsis; /* 超出部分用省略号表示 */
+}
+
