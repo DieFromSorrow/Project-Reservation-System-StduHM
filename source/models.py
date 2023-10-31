@@ -1,7 +1,7 @@
-from source.extensions import db
 from flask_sqlalchemy import SQLAlchemy
-from source.extensions import time_choices
 
+from source.extensions import db
+from source.extensions import time_choices
 
 db: SQLAlchemy = db
 
@@ -43,4 +43,3 @@ class Reservation(db.Model):
                f"   :explain {self.explain}\n" \
                f"   :notes {self.notes if len(self.notes) < 53 else self.notes[:50] + '...'}" \
                f"   :time_submitted {self.time_submitted}\n"
-

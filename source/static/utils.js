@@ -1,4 +1,3 @@
-
 function urlfor(endpoint, params = {}) {
     let baseApi = "/api/v1/url/";
     return new Promise(function (resolve, reject) {

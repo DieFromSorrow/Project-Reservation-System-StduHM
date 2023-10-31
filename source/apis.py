@@ -1,14 +1,16 @@
+import json
+from datetime import datetime
+
+from flask import request, jsonify, url_for
 from flask.blueprints import Blueprint
 from flask.views import MethodView
-from flask import request, jsonify, url_for
-from source.extensions import db
-from source.models import Reservation
-from source.forms import ReservationForm
-from datetime import datetime
-from werkzeug.datastructures import MultiDict
-from sqlalchemy import desc
 from flask_socketio import emit
-import json
+from sqlalchemy import desc
+from werkzeug.datastructures import MultiDict
+
+from source.extensions import db
+from source.forms import ReservationForm
+from source.models import Reservation
 
 api = Blueprint('api', __name__)
 

@@ -273,8 +273,7 @@ function registerFormSubmit() {
                         // You can redirect or perform other actions upon successful reservation
                         alert(response.message);
                         showResults();
-                    }
-                    else {
+                    } else {
                         showErrors(response.errors)
                     }
                 },

@@ -1,11 +1,12 @@
-from flask import Flask, render_template, url_for, redirect
-from source.extensions import db
-from source.models import Reservation
-from source.forms import ReservationForm
-from source.commands import register_initdb
+from flask import Flask, render_template, redirect
+
 from source.apis import api
-from source.settings import Config, DevelopmentConfig
+from source.commands import register_initdb
+from source.extensions import db
 from source.extensions import socketio
+from source.forms import ReservationForm
+from source.models import Reservation
+from source.settings import Config, DevelopmentConfig
 
 
 def create_app(config=DevelopmentConfig):
@@ -15,7 +16,6 @@ def create_app(config=DevelopmentConfig):
     register_blueprints(app)
     register_extensions(app)
     register_commands(app)
-
     return app
 
 
@@ -61,4 +61,3 @@ def register_commands(app: Flask):
 
 if __name__ == "__main__":
     socketio.run(create_app())
-

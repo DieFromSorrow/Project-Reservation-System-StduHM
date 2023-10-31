@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, BooleanField, DateField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, Length, ValidationError
-from source.models import Reservation
+
 from source.extensions import time_choices
+from source.models import Reservation
 
 
 class ReservationForm(FlaskForm):

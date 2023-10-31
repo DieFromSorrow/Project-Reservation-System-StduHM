@@ -1,4 +1,3 @@
-
 const endpoint = "api.reservations"; // Update with your actual API endpoint
 let min_id = null;
 
@@ -25,11 +24,11 @@ $(document).ready(function () {
 
     let socket = io()
 
-    socket.on('connect', function() {
+    socket.on('connect', function () {
         console.log('Connected to the server');
     });
 
-    socket.on('new_reservation', function(data) {
+    socket.on('new_reservation', function (data) {
         // 处理新的数据
         console.log('New data:', data);
         putNewRecord(data)
@@ -52,7 +51,7 @@ function putNewRecord(record) {
 }
 
 
-function getUrl(limit=null, begin_id=null, end_id=null) {
+function getUrl(limit = null, begin_id = null, end_id = null) {
     const params = {
         name: $("#name").val(),
         identity: $("#identity").val(),
@@ -106,7 +105,7 @@ function registerClick() {
 }
 
 
-function loadRecords(limit=null, end_id=null, dropped_all=true) {
+function loadRecords(limit = null, end_id = null, dropped_all = true) {
     getUrl(limit, null, end_id).then(function (url) {
         $.ajax({
             type: "GET",
@@ -123,8 +122,7 @@ function loadRecords(limit=null, end_id=null, dropped_all=true) {
                     renderData(records, dropped_all);
                     registerClick();
                     min_id = records[records.length - 1].id - 1
-                }
-                else {
+                } else {
                     $loadMoreBtn.prop("disabled", true);
                 }
             },
@@ -133,9 +131,9 @@ function loadRecords(limit=null, end_id=null, dropped_all=true) {
             }
         });
     })
-    .catch(function (error) {
-        console.error("Error building URL: " + error);
-    });
+        .catch(function (error) {
+            console.error("Error building URL: " + error);
+        });
 }
 
 function initPage() {
