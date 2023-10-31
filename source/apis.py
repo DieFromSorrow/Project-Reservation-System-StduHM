@@ -1,4 +1,3 @@
-import time
 from flask.blueprints import Blueprint
 from flask.views import MethodView
 from flask import request, jsonify, url_for
@@ -7,25 +6,15 @@ from source.models import Reservation
 from source.forms import ReservationForm
 from datetime import datetime
 from werkzeug.datastructures import MultiDict
-from sqlalchemy import and_, or_, desc
+from sqlalchemy import desc
+from flask_socketio import emit
 import json
 
 api = Blueprint('api', __name__)
 
 
 def reservation_schema(reservation: Reservation):
-    return {
-        'id': reservation.id,
-        'name': reservation.name,
-        'identity': reservation.identity,
-        'phone': reservation.phone,
-        'date': reservation.date,
-        'time': reservation.time,
-        'num_peoples': reservation.num_peoples,
-        'explain': reservation.explain,
-        'notes': reservation.notes,
-        'time_submitted': reservation.time_submitted
-    }
+    return reservation.to_json()
 
 
 def reservations_schema(reservations):
@@ -64,6 +53,13 @@ class GuidersAPI(MethodView):
             guilders = guilders[weekday]
         return jsonify(guilders)
 
+    def post(self):
+        json_path = 'source/guiders.json'
+        with open(json_path, 'w', encoding='utf-8') as file:
+            # print(request.json)
+            file.write(str(request.json).replace("'", '"'))
+        return {'success': True}
+
 
 class ReservationAPI(MethodView):
     def get(self, item_id):
@@ -90,13 +86,13 @@ class ReservationsAPI(MethodView):
 
     def post(self):
         form_json = request.json
-        print(form_json)
+        # print(form_json)
         form = ReservationForm(MultiDict(form_json))  # 使用 ReservationForm 进行表单验证
 
         if form.validate():  # 如果表单验证通过
             data = form.data
-            print(type(data))
             # Create a new reservation entry in the database
+            now = datetime.now()
             reservation = Reservation(
                 name=data['name'],
                 identity=data['identity'],
@@ -106,15 +102,20 @@ class ReservationsAPI(MethodView):
                 num_peoples=data['num_peoples'],
                 explain=data['explain'],
                 notes=data['notes'],
-                time_submitted=datetime.now()
+                time_submitted=now
             )
 
             db.session.add(reservation)
             db.session.commit()
 
+            form_json['id'] = Reservation.query.order_by(desc(Reservation.id)).first().id
+            form_json['time_submitted'] = str(now)
+
+            emit('new_reservation', form_json, namespace='', broadcast=True)
+
             return jsonify({'success': True, 'message': '预约成功！'})
         else:
-            print(form.errors)
+            # print(form.errors)
             return jsonify({'success': False, 'errors': form.errors})
 
 

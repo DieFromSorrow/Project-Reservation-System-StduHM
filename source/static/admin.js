@@ -1,3 +1,4 @@
+
 const endpoint = "api.reservations"; // Update with your actual API endpoint
 let min_id = null;
 
@@ -22,46 +23,32 @@ $(document).ready(function () {
         })
     });
 
+    let socket = io()
+
+    socket.on('connect', function() {
+        console.log('Connected to the server');
+    });
+
+    socket.on('new_reservation', function(data) {
+        // 处理新的数据
+        console.log('New data:', data);
+        putNewRecord(data)
+    });
+
 });
 
-function formatDateTimeToCustomFormat(dateString) {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
 
-    return `${year}年${month}月${day}日-${hours}:${minutes}`;
-}
-
-function formatDateToCustomFormat(dateString) {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-
-    return `${year}年${month}月${day}日`;
-}
-
-
-function handleLongText(text) {
-    if (text.length <= 7) {
-        return text;
-    }
-    return `
-    <button class="btn btn-primary view-text">查看备注</button>
-    <div class="text-content" style="display: none;">
-        ${text}
-    </div>`;
-}
-
-
-function handleNotes(notes) {
-    if (notes === null || notes === "" || notes === undefined) {
-        return "无";
-    }
-    return handleLongText(notes);
+function putNewRecord(record) {
+    let pName = $("#name").val();
+    let pIdentity = $("#identity").val();
+    let pDate = $("#date").val();
+    let pTime = $("#time").val();
+    if (pName && (pName !== record.name)) return;
+    if (pIdentity && pIdentity !== record.identity) return;
+    if (pDate && pDate !== record.date) return;
+    if (pTime && pTime !== record.time) return;
+    console.log("OK")
+    $("#dataRows").prepend($(constructRecord(record)));
 }
 
 
@@ -80,6 +67,23 @@ function getUrl(limit=null, begin_id=null, end_id=null) {
 }
 
 
+function constructRecord(record) {
+    return `
+        <tr>
+            <td>${record.id}</td>
+            <td>${record.name}</td>
+            <td>${record.identity}</td>
+            <td>${record.phone}</td>
+            <td>${formatDateToCustomFormat(record.date)}</td>
+            <td>${record.time}</td>
+            <td>${record.num_peoples}</td>
+            <td>${record.explain ? "是" : "否"}</td>
+            <td>${handleNotes(record["notes"])}</td>
+            <td>${formatDateTimeToCustomFormat(record["time_submitted"])}</td>
+        </tr>`
+}
+
+
 function renderData(records, dropped_all) {
     const dataRows = $("#dataRows");
     if (dropped_all) {
@@ -88,20 +92,7 @@ function renderData(records, dropped_all) {
 
     for (const record of records) {
         // Create and append table rows
-        dataRows.append(`
-            <tr>
-                <td>${record.id}</td>
-                <td>${record.name}</td>
-                <td>${record.identity}</td>
-                <td>${record.phone}</td>
-                <td>${formatDateToCustomFormat(record.date)}</td>
-                <td>${record.time}</td>
-                <td>${record.num_peoples}</td>
-                <td>${record.explain ? "是" : "否"}</td>
-                <td>${handleNotes(record["notes"])}</td>
-                <td>${formatDateTimeToCustomFormat(record["time_submitted"])}</td>
-            </tr>
-        `);
+        dataRows.append(constructRecord(record));
     }
 }
 
@@ -150,7 +141,7 @@ function loadRecords(limit=null, end_id=null, dropped_all=true) {
 function initPage() {
     const container = $("#container");
     const head = `
-        <h1>数据库管理后台</h1>`;
+        <h1>校史馆预约管理后台</h1>`;
     const form = `
         <!-- Filter and Search Bar -->
         <div class="form-group">
@@ -178,7 +169,7 @@ function initPage() {
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>ID</th>
+                <th class="th-left">ID</th>
                 <th>姓名</th>
                 <th>单位</th>
                 <th>电话</th>
@@ -187,7 +178,7 @@ function initPage() {
                 <th>人数</th>
                 <th>讲解</th>
                 <th>备注</th>
-                <th>提交时间</th>
+                <th class="th-right">提交时间</th>
             </tr>
             </thead>
             <tbody id="dataRows">

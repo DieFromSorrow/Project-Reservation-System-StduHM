@@ -13,10 +13,10 @@ $(document).ready(function () {
 function initDate() {
     let $date = $("#date");
     let offset = 1;
-    while ([0, 6].includes((new Date(getDateStr(offset))).getDay())) {
-        offset += 1;
-    }
-    let firstDay = getDateStr(offset);
+    // while ([0, 6].includes((new Date(transToFormat(getDateStr(offset)))).getDay())) {
+    //     offset += 1;
+    // }
+    let firstDay = transToFormat(getDateStr(offset));
     $date.val(firstDay);
     $date.data("previous", firstDay)
     $date.prop("min", firstDay);
@@ -73,6 +73,10 @@ function selectTimeSegment($selectedElement) {
     }
     if ($selectedElement.hasClass("reserved")) {
         flash("该场次已被预订", $selectedElement);
+        return;
+    } else if ($selectedElement.hasClass("unable")) {
+        flash("该场次不提供服务，抱歉", $selectedElement);
+        return;
     } else {
         $('.time-segment').removeClass("selected");
         $selectedElement.addClass("selected");
@@ -117,33 +121,25 @@ function registerDateChange() {
 
 function selectDate() {
     const $date = $('#date');
-    if ($date.val() < getDateStr(1)) {
+    if (new Date($date.val()) < new Date(transToFormat(getDateStr(1)))) {
         $date.val($date.data("previous"));
         flash("不能预约今天和之前的日期");
         return;
     }
-    let weekday = (new Date($date.val())).getDay();
-    if (weekday === 0 || weekday === 6) {
-        $date.val($date.data("previous"));
-        flash("资源有限，周六日不提供服务，请谅解");
-        return;
-    }
+    // let weekday = (new Date($date.val())).getDay();
+    // if (weekday === 0 || weekday === 6) {
+    //     $date.val($date.data("previous"));
+    //     flash("资源有限，周六日不提供服务，请谅解");
+    //     return;
+    // }
     $date.data("previous", $date.val());
     handleTimes($date.val());
 }
 
 
-function getDateStr(offset) {
-    const today = new Date();
-    const date = new Date(today);
-    date.setDate(today.getDate() + offset);
-    return date.toLocaleDateString('zh-CN').replaceAll('/', '-');
-}
-
-
 function handleSelected(response) {
     let reservedTime = Array()
-    let reservations = response.reservations;
+    let reservations = response["reservations"];
     reservations.forEach(reservation => reservedTime.push(reservation.time))
     $(".time-segment").removeClass("reserved").each((index, elem) => {
         let $elem = $(elem)
@@ -162,31 +158,6 @@ function handleUnable(response, weekday) {
     setNumGuider("Am", response, weekday);
     setNumGuider("Pm", response, weekday);
     initTime();
-}
-
-
-function compareTimeStrings(timeStr1, timeStr2) {
-    const [hour1, minute1] = timeStr1.split(":").map(Number);
-    const [hour2, minute2] = timeStr2.split(":").map(Number);
-
-    if (isNaN(hour1) || isNaN(minute1) || isNaN(hour2) || isNaN(minute2)) {
-        // 输入的时间字符串无效
-        console.error('time string error');
-    }
-    if (hour1 < hour2) {
-        return -1; // timeStr1 < timeStr2
-    } else if (hour1 > hour2) {
-        return 1; // timeStr1 > timeStr2
-    } else {
-        // 小时相同，比较分钟
-        if (minute1 < minute2) {
-            return -1; // timeStr1 < timeStr2
-        } else if (minute1 > minute2) {
-            return 1; // timeStr1 > timeStr2
-        } else {
-            return 0; // timeStr1 === timeStr2
-        }
-    }
 }
 
 
@@ -250,9 +221,9 @@ function registerCheckNumPeoples() {
     const $numPeoples = $("#num_peoples")
     $numPeoples.on("change",
         function () {
-            if ($numPeoples.val() > 60) {
-                flash("预约人数不能超过 60");
-                $numPeoples.val(60);
+            if ($numPeoples.val() > 40) {
+                flash("预约人数不能超过 40");
+                $numPeoples.val(40);
             }
             refreshExplain();
         }
@@ -264,7 +235,16 @@ function registerFormSubmit() {
     $("#reservationForm").submit(function (event) {
         event.preventDefault();
 
-        $('button[type="submit"]').prop('disabled', true);
+        const submitBtn = $('button[type="submit"]');
+
+        submitBtn.prop('disabled', true);
+        let time = $("#selectedTime").val()
+
+        if (!time) {
+            alert("此日期所有时段已被预约，请更换其他日期");
+            submitBtn.prop('disabled', false);
+            return;
+        }
 
         // Collect form data
         const formData = {
@@ -272,7 +252,7 @@ function registerFormSubmit() {
             identity: $("#identity").val(),
             phone: $("#phone").val(),
             date: $("#date").val(), // 获取选定的日期
-            time: $("#selectedTime").val(), // 获取选定的时间
+            time: time, // 获取选定的时间
             num_peoples: $("#num_peoples").val(),
             explain: $("#explain").prop("checked"),
             notes: $("#notes").val(),
@@ -289,11 +269,14 @@ function registerFormSubmit() {
                 contentType: "application/json",
                 headers: {"X-CSRF-Token": formData.csrf_token},  // Use the CSRF token from formData
                 success: function (response) {
-                    if (response.success) alert(response.message);
+                    if (response.success) {
+                        // You can redirect or perform other actions upon successful reservation
+                        alert(response.message);
+                        showResults();
+                    }
                     else {
                         showErrors(response.errors)
                     }
-                    // You can redirect or perform other actions upon successful reservation
                 },
                 error: function (error) {
                     console.log("Error:", error);
@@ -311,18 +294,6 @@ function registerFormSubmit() {
 }
 
 
-function flash(message) {
-    // 创建一个新的段落元素来展示闪烁信息
-    const flashMessage = $('<p>').addClass('flash-message').text(message);
-    // 将新的段落元素添加到页面中并设置样式
-    $('body').append(flashMessage);
-    // 闪烁效果
-    flashMessage.fadeIn(618).delay(1000).fadeOut(382, () => {
-        $(this).remove();
-    });
-}
-
-
 function showErrors(errors) {
     $.each(errors, function (fieldName, errorMessages) {
         let field = $('#' + fieldName);
@@ -336,17 +307,80 @@ function showErrors(errors) {
 }
 
 
+function showResults() {
+    const container = $("#container");
+    container.html(`<h2>预约结果</h2>
+        <!-- Table to Display Data -->
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th class="th-left">日期</th>
+                <th>场次</th>
+                <th>人数</th>
+                <th class="th-right">讲解</th>
+            </tr>
+            </thead>
+            <tbody id="dataRows">
+            <!-- Data rows will be inserted here dynamically -->
+            </tbody>
+        </table>
+        <!-- 模态框 -->
+        <div class="modal" id="text-modal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">备注内容</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body" id="text-modal-body">
+                        <!-- 这里将显示文本内容 -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>`)
+    const params = {
+        name: $("#name").val()
+    }
+    const dataRows = $("#dataRows");
+    urlfor("api.reservations", params).then(function (url) {
+        $.ajax({
+            type: "GET",
+            url: url,
+            contentType: "application/json",
+            success: function (data) {
+                const records = data["reservations"];
+                for (const record of records) {
+                    // Create and append table rows
+                    dataRows.append(`
+                        <tr>
+                            <td>${formatDateToCustomFormat(record.date).slice(5)}</td>
+                            <td>${record.time}</td>
+                            <td>${record.num_peoples}</td>
+                            <td>${record.explain ? "是" : "否"}</td>
+                        </tr>
+                    `);
+                }
+            }
+        })
+    })
+}
+
+
 function initPage() {
     let container = $("#container");
     const head = `
         <div class="text-center">
+            <br />
             <h2>校史馆团体预约参观</h2>
         </div>`
     const tips = `
-        <div class="alert alert-info smaller-text">
+        <div class="alert alert-primary smaller-text">
             <strong>温馨提示：<br /></strong>
             <p class="add-indent">因人手有限，暂定校史馆周一、周二、周四下午，周三、周五全天内的指定时段提供讲解服务。
-               （寒暑假及法定节假日另行通知）为保障参观安全及效果，每批参观人数建议不超过50人。
+               （寒暑假及法定节假日另行通知）为保障参观安全及效果，每批参观人数建议不超40人。
             </p>
         </div>`
     const form = `

@@ -29,7 +29,7 @@ h2 {
     white-space: nowrap; /* 防止换行 */
 }
 
-.date-segment, .time-segment {
+.time-segment {
     font-size: 13px;
     flex-grow: 0; /* 关闭 flex-grow */
     flex-shrink: 0; /* 关闭 flex-shrink */
@@ -42,18 +42,26 @@ h2 {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-radius: 8px;
+    border-radius: 5px;
+}
+
+.time-segment {
+    color: black;
 }
 
 .time-segment.selected {
     background-color: #007bff;
-    color: #fff;
+    color: white;
 }
 
 .time-segment.reserved {
-    color: #000;
-    background-color: #cacaca;
-    border-color: grey;
+    background-color: #fff3cd;
+    border-color: #856404;
+}
+
+.time-segment.unable {
+    background-color: #dbe3ea;
+    border-color: #4e555b;
 }
 
 .ampm {
@@ -132,10 +140,6 @@ th, td {
     padding: 10px; /* 增加表格单元格内的间距 */
 }
 
-.unable {
-    display: none;
-}
-
 .smaller-text {
     font-size: 13px; /* 调整字体大小为14px，可以根据需要进行调整 */
 }
@@ -149,6 +153,10 @@ h5 {
     font-weight: bolder;
 }
 
+.alert {
+    background-color: #c3dfff99;
+}
+
 .attention {
     font-size: small;
 }
@@ -158,3 +166,27 @@ h5 {
     vertical-align: middle;
 }
 
+
+table {
+    background-color: #fff;
+    width: 100%;
+    table-layout: unset;
+    border-radius: 5px;
+}
+
+th {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.th-left {
+    border-top-left-radius: 5px;
+}
+
+.th-right {
+    border-top-right-radius: 5px;
+}
+
+td {
+    font-size: small;
+}

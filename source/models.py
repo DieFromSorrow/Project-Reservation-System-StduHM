@@ -18,6 +18,20 @@ class Reservation(db.Model):
     notes = db.Column(db.Text)
     time_submitted = db.Column(db.DateTime, nullable=False)
 
+    def to_json(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "identity": self.identity,
+            "phone": self.phone,
+            "date": str(self.date),  # Convert date to string
+            "time": self.time,
+            "num_peoples": self.num_peoples,
+            "explain": self.explain,
+            "notes": self.notes,
+            "time_submitted": str(self.time_submitted)  # Convert datetime to string
+        }
+
     def __repr__(self):
         return f"<Reservation {self.id}>\n" \
                f"   :name {self.name}\n" \
