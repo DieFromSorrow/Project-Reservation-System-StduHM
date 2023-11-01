@@ -161,6 +161,10 @@ h5 {
     font-size: small;
 }
 
+strong {
+    padding-bottom: 318px;
+}
+
 .form-group label, .form-group input {
     display: inline-block;
     vertical-align: middle;
@@ -189,4 +193,13 @@ th {
 
 td {
     font-size: small;
+}
+
+img {
+    width: 90%;
+    max-width: 500px;
+    height: auto;
+    display: block;
+    margin: auto;
+    padding-top: 7%;
 }

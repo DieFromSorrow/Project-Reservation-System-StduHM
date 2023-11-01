@@ -1,6 +1,6 @@
 import click
 
-from source import db
+from source.extensions import db
 
 
 def register_initdb(app):

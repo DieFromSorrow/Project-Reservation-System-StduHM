@@ -4,6 +4,12 @@ $(document).ready(function () {
     registerSubmit();
 });
 
+function checkKey() {
+    let key = "secret_key"; // 这是你的密匙
+    let userInput = prompt("请输入密匙："); // 弹出一个输入框，让用户输入字符串
+    return userInput === key;
+}
+
 
 function fetchData() {
     urlfor("api.guiders")
@@ -31,7 +37,7 @@ function registerSubmit() {
     $('#jsonForm').submit(function (event) {
         event.preventDefault();
         let jsonData = $('#jsonData').val();
-        if (confirm("Are you sure you want to submit this data?")) {
+        if (checkKey()) {
             urlfor("api.guiders")
                 .then(function (url) {
                     $.ajax({
@@ -52,6 +58,9 @@ function registerSubmit() {
                     console.error(error);
                 });
         }
+        else {
+            alert("密匙错误");
+        }
     });
 }
 
@@ -62,7 +71,7 @@ function initPage() {
         <form id="jsonForm">
             <div class="form-group">
                 <label for="jsonData">JSON Data</label>
-                <textarea class="form-control" id="jsonData" rows="30"></textarea>
+                <textarea class="form-control" id="jsonData" rows="27"></textarea>
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>`
