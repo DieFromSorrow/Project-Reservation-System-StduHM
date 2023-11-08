@@ -5,7 +5,7 @@
     background-color: #f8f9fa;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 96%; /* 设置最大宽度，根据需要进行调整 */
+    max-width: 960px; /* 设置最大宽度 */
 }
 
 h2 {
@@ -23,17 +23,17 @@ h2 {
 
 .date-bar, .time-bar {
     display: flex;
-    justify-content: flex-start; /* 使用 flex-start 以确保左侧对齐 */
+    justify-content: flex-start;
     margin-top: 10px;
-    overflow-x: auto; /* 启用水平滚动条 */
-    white-space: nowrap; /* 防止换行 */
+    overflow-x: auto;
+    white-space: nowrap;
 }
 
 .time-segment {
     font-size: 13px;
-    flex-grow: 0; /* 关闭 flex-grow */
-    flex-shrink: 0; /* 关闭 flex-shrink */
-    flex-basis: 100px; /* 设置每个 time-segment 的初始宽度，可以根据需要调整 */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 100px; /* 根据需要调整 */
     height: 45px;
     background-color: #fff;
     border: 2px solid #007bff;
@@ -43,9 +43,6 @@ h2 {
     justify-content: center;
     cursor: pointer;
     border-radius: 5px;
-}
-
-.time-segment {
     color: black;
 }
 
@@ -85,23 +82,21 @@ body {
 }
 
 /* Webkit浏览器的滚动条样式 */
-/* 这里可以根据需要进行调整，比如改变颜色、宽度等 */
 ::-webkit-scrollbar {
-    width: 2px; /* 设置滚动条宽度 */
+    width: 2px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #00000000; /* 设置滚动条的颜色 */
-    border-radius: 3px; /* 设置滚动条的圆角 */
+    background-color: #00000000;
+    border-radius: 3px;
 }
 
 ::-webkit-scrollbar-track {
-    background-color: #00000000; /* 设置滚动条轨道的颜色 */
+    background-color: #00000000;
 }
 
-/* 悬停时滚动条的样式 */
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #0056b3; /* 设置悬停时滚动条的颜色 */
+    background-color: #0056b3;
 }
 
 .flash-message {
@@ -115,37 +110,21 @@ body {
     border-radius: 10px;
 }
 
-.container {
-    max-width: 960px; /* 设置容器最大宽度 */
-}
-
-h2 {
-    text-align: center; /* 标题居中 */
-    margin-bottom: 30px; /* 增加标题下方的间距 */
-}
-
-.form-group {
-    margin-bottom: 20px; /* 增加表单元素之间的间距 */
-}
-
-.btn-primary {
-    width: 100%; /* 让按钮充满父元素宽度 */
-}
-
 table {
-    margin-top: 30px; /* 增加表格上方的间距 */
+    margin-top: 30px;
+    background-color: #fff;
+    width: 100%;
+    table-layout: unset;
+    border-radius: 5px;
 }
 
 th, td {
-    padding: 10px; /* 增加表格单元格内的间距 */
-}
-
-.smaller-text {
-    font-size: 13px; /* 调整字体大小为14px，可以根据需要进行调整 */
+    padding: 10px;
+    font-size: small;
 }
 
 .add-indent {
-    text-indent: 2em; /* 增加段首空两字 */
+    text-indent: 2em;
 }
 
 h5 {
@@ -168,31 +147,6 @@ strong {
 .form-group label, .form-group input {
     display: inline-block;
     vertical-align: middle;
-}
-
-
-table {
-    background-color: #fff;
-    width: 100%;
-    table-layout: unset;
-    border-radius: 5px;
-}
-
-th {
-    background-color: #007bff;
-    color: #fff;
-}
-
-.th-left {
-    border-top-left-radius: 5px;
-}
-
-.th-right {
-    border-top-right-radius: 5px;
-}
-
-td {
-    font-size: small;
 }
 
 img {
