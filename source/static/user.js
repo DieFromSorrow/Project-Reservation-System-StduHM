@@ -376,9 +376,9 @@ function initPage() {
             <h2>校史馆团体预约参观</h2>
         </div>`
     const tips = `
-        <div class="alert alert-primary smaller-text">
+        <div class="alert align-baseline smaller-text">
             <strong>温馨提示：<br /></strong>
-            <p class="add-indent">因人手有限，暂定校史馆周一、周二、周四下午，周三、周五全天内的指定时段提供讲解服务。
+            <p class="add-indent">为精准提供校史馆讲解服务，暂定校史馆周一、周二、周四下午，周三、周五全天内的指定时段提供讲解服务。
                （寒暑假及法定节假日另行通知）为保障参观安全及效果，每批参观人数建议不超40人。
             </p>
         </div>`

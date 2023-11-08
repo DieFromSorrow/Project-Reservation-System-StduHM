@@ -203,3 +203,15 @@ img {
     margin: auto;
     padding-top: 7%;
 }
+
+.shm {
+    max-width: 960px;
+}
+
+.tip {
+    display: block;
+    margin: auto;
+    max-width: 90%;
+    border: 3px #9fcdff;
+    border-radius: 3px;
+}
