@@ -225,6 +225,10 @@ function registerCheckNumPeoples() {
                 flash("预约人数不能超过 40");
                 $numPeoples.val(40);
             }
+            if ($numPeoples.val() <= 0) {
+                flash("预约人数不能小于等于 0");
+                $numPeoples.val(1);
+            }
             refreshExplain();
         }
     )
@@ -307,6 +311,12 @@ function showErrors(errors) {
 
 
 function showResults() {
+    const params = {
+        name: $("#name").val()
+    }
+    const image = $("#my-image");
+    image.remove();
+
     const container = $("#container");
     container.html(`<h2>预约结果</h2>
         <!-- Table to Display Data -->
@@ -340,9 +350,6 @@ function showResults() {
                 </div>
             </div>
         </div>`)
-    const params = {
-        name: $("#name").val()
-    }
     const dataRows = $("#dataRows");
     urlfor("api.reservations", params).then(function (url) {
         $.ajax({
@@ -351,17 +358,16 @@ function showResults() {
             contentType: "application/json",
             success: function (data) {
                 const records = data["reservations"];
-                for (const record of records) {
-                    // Create and append table rows
-                    dataRows.append(`
-                        <tr>
-                            <td>${formatDateToCustomFormat(record.date).slice(5)}</td>
-                            <td>${record.time}</td>
-                            <td>${record.num_peoples}</td>
-                            <td>${record.explain ? "是" : "否"}</td>
-                        </tr>
-                    `);
-                }
+                const record = records[1];
+                // Create and append table rows
+                dataRows.append(`
+                    <tr>
+                        <td>${formatDateToCustomFormat(record.date).slice(5)}</td>
+                        <td>${record.time}</td>
+                        <td>${record.num_peoples}</td>
+                        <td>${record.explain ? "是" : "否"}</td>
+                    </tr>
+                `);
             }
         })
     })

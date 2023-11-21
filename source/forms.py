@@ -25,5 +25,5 @@ class ReservationForm(FlaskForm):
             raise ValidationError('预订冲突：此时时段已被预定')
 
     def validate_num_peoples(self, field):
-        if field.data > 40:
-            raise ValidationError('每场次最多40人')
+        if 1 > field.data > 40:
+            raise ValidationError('人数非法')
