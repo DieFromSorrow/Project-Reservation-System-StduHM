@@ -4,9 +4,11 @@ from source.apis import api
 from source.commands import register_initdb
 from source.extensions import db
 from source.extensions import socketio
+from source.extensions import mail
 from source.forms import ReservationForm
 from source.models import Reservation
 from source.settings import Config, DevelopmentConfig
+from datetime import timedelta
 
 
 def create_app(config=DevelopmentConfig):
@@ -53,6 +55,7 @@ def register_socketio(app: Flask):
 
 def register_extensions(app: Flask):
     db.init_app(app)
+    mail.init_app(app)
 
 
 def register_commands(app: Flask):

@@ -16,6 +16,7 @@ class Reservation(db.Model):
     num_peoples = db.Column(db.SmallInteger, nullable=False)  # Change to SmallInteger type
     explain = db.Column(db.Boolean, nullable=False)
     notes = db.Column(db.Text)
+    email = db.Column(db.String(64), nullable=False)
     time_submitted = db.Column(db.DateTime, nullable=False)
 
     def to_json(self):

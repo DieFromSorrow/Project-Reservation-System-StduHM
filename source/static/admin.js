@@ -123,6 +123,7 @@ function loadRecords(limit = null, end_id = null, dropped_all = true) {
                     registerClick();
                     min_id = records[records.length - 1].id - 1
                 } else {
+                    $loadMoreBtn.innerText = "已到底";
                     $loadMoreBtn.prop("disabled", true);
                 }
             },

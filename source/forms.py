@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, BooleanField, DateField, SelectField, TextAreaField
+from wtforms import StringField, IntegerField, BooleanField, DateField, \
+    SelectField, TextAreaField, EmailField
 from wtforms.validators import DataRequired, Length, ValidationError
 
 from source.extensions import time_choices
@@ -14,6 +15,7 @@ class ReservationForm(FlaskForm):
     time = SelectField('Time', choices=time_choices, validators=[DataRequired()])
     num_peoples = IntegerField('Number of People', validators=[DataRequired()])
     explain = BooleanField('Explanation')
+    email = EmailField('Email')
     notes = TextAreaField('Notes')
 
     def validate_time(self, field):

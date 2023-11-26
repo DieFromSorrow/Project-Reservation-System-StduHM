@@ -4,6 +4,7 @@ $(document).ready(function () {
     initTimeBar();
     registerDateChange();
     registerCheckNumPeoples();
+    registerSendCaptcha();
     registerFormSubmit();
     initTime();
 })
@@ -235,6 +236,57 @@ function registerCheckNumPeoples() {
 }
 
 
+function countdownButton($btn, seconds) {
+    $btn.prop('disabled', true);
+    let originalText = $btn.text();
+
+    function updateButtonText(seconds) {
+        $btn.text(seconds + 's 后可再次点击');
+    }
+
+    updateButtonText(seconds);
+
+    let countdownInterval = setInterval(function () {
+        seconds--;
+
+        updateButtonText(seconds);
+
+        if (seconds <= 0) {
+            $btn.prop('disabled', false).text(originalText);
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
+}
+
+
+function registerSendCaptcha() {
+    $("#captcha-btn").click(function () {
+        let email = $("#email").val();
+        if (!email) {
+            flash("请先填写电子邮箱");
+        } else {
+            urlfor("api.email").then(url => {
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    contentType: "application/json",
+                    data: JSON.stringify({email: email}),
+                    success: function (response) {
+                        if (response.success) {
+                            flash(response.message);
+                            countdownButton($("#captcha-btn"), 60);
+                        } else {
+                            flash(response.message);
+                            countdownButton($("#captcha-btn"), 1);
+                        }
+                    }
+                })
+            })
+        }
+    })
+}
+
+
 function registerFormSubmit() {
     $("#reservationForm").submit(function (event) {
         event.preventDefault();
@@ -260,10 +312,12 @@ function registerFormSubmit() {
             num_peoples: $("#num_peoples").val(),
             explain: $("#explain").prop("checked"),
             notes: $("#notes").val(),
+            email: $("#email").val(),
+            captcha: $("#captcha").val(),
             csrf_token: $("#csrf_token").val()  // Include the CSRF token
         };
 
-        console.log(JSON.stringify(formData))
+        // console.log(JSON.stringify(formData))
 
         urlfor("api.reservations").then(url => {
             $.ajax({
@@ -278,18 +332,14 @@ function registerFormSubmit() {
                         alert(response.message);
                         showResults();
                     } else {
-                        showErrors(response.errors)
+                        showErrors(response.errors);
                     }
+                    $('button[type="submit"]').prop('disabled', false);
                 },
                 error: function (error) {
                     console.log("Error:", error);
                     alert("预约失败，请重试！");
-                },
-                complete: function () {
-                    // Enable the submit button
-                    $('button[type="submit"]').prop('disabled', false);
-                    selectDate();
-                    initTime();
+                    countdownButton($('button[type="submit"]'), 5);
                 }
             });
         })
@@ -312,7 +362,7 @@ function showErrors(errors) {
 
 function showResults() {
     const params = {
-        name: $("#name").val()
+        email: $("#email").val()
     }
     const image = $("#my-image");
     image.remove();
@@ -332,24 +382,10 @@ function showResults() {
             <tbody id="dataRows">
             <!-- Data rows will be inserted here dynamically -->
             </tbody>
-        </table>
-        <!-- 模态框 -->
-        <div class="modal" id="text-modal">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4 class="modal-title">备注内容</h4>
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    </div>
-                    <div class="modal-body" id="text-modal-body">
-                        <!-- 这里将显示文本内容 -->
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-                    </div>
-                </div>
-            </div>
-        </div>`)
+        </table>`)
+
+    let today = new Date();
+
     const dataRows = $("#dataRows");
     urlfor("api.reservations", params).then(function (url) {
         $.ajax({
@@ -357,17 +393,26 @@ function showResults() {
             url: url,
             contentType: "application/json",
             success: function (data) {
+                // console.log(data);
                 const records = data["reservations"];
-                const record = records[1];
-                // Create and append table rows
-                dataRows.append(`
-                    <tr>
-                        <td>${formatDateToCustomFormat(record.date).slice(5)}</td>
-                        <td>${record.time}</td>
-                        <td>${record.num_peoples}</td>
-                        <td>${record.explain ? "是" : "否"}</td>
-                    </tr>
-                `);
+                records.forEach(record => {
+                    // Create and append table rows
+                    let btnHtml = '';
+                    if (new Date(record.date) < today) {
+                        btnHtml = '<td><button id="revoke-btn" class="btn btn-primary btn-small" disabled>已过期</button></td>';
+                    } else {
+                        btnHtml = '<td><button id="revoke-btn" class="btn btn-primary btn-small">撤回预约</button></td>'
+                    }
+                    dataRows.append(`
+                        <tr>
+                            <td>${formatDateToCustomFormat(record.date).slice(5)}</td>
+                            <td>${record.time}</td>
+                            <td>${record.num_peoples}</td>
+                            <td>${record.explain ? "是" : "否"}</td>
+                            ${btnHtml}
+                        </tr>
+                    `);
+                })
             }
         })
     })
@@ -382,9 +427,9 @@ function initPage() {
             <h2>校史馆团体预约参观</h2>
         </div>`
     const tips = `
-        <div class="alert align-baseline smaller-text">
+        <div class="alert align-baseline">
             <strong>温馨提示：<br /></strong>
-            <p class="add-indent">为精准提供校史馆讲解服务，暂定校史馆周一、周二、周四下午，周三、周五全天内的指定时段提供讲解服务。
+            <p class="add-indent small">为精准提供校史馆讲解服务，暂定校史馆周一、周二、周四下午，周三、周五全天内的指定时段提供讲解服务。
                （寒暑假及法定节假日另行通知）为保障参观安全及效果，每批参观人数建议不超40人。
             </p>
         </div>`
@@ -420,6 +465,19 @@ function initPage() {
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="explain">
                     <label class="form-check-label" for="explain">需要讲解</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email">电子邮箱：</label>
+                <input type="email" class="form-control" id="email" name="email" required placeholder="请输入您的电子邮箱">
+            </div>
+            <div class="form-group row">
+                <label for="captcha" class="col-sm-12 col-form-label">邮箱验证码：</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="captcha" name="captcha" required placeholder="请输入验证码">
+                </div>
+                <div class="col-sm-4">
+                    <button type="button" class="btn btn-primary" id="captcha-btn">获取验证码</button>
                 </div>
             </div>
             <div class="form-group">

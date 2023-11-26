@@ -1,7 +1,9 @@
+import asyncio
 import json
+from werkzeug.routing.exceptions import BuildError
 from datetime import datetime
 
-from flask import request, jsonify, url_for
+from flask import request, jsonify, url_for, session
 from flask.blueprints import Blueprint
 from flask.views import MethodView
 from flask_socketio import emit
@@ -11,6 +13,8 @@ from werkzeug.datastructures import MultiDict
 from source.extensions import db
 from source.forms import ReservationForm
 from source.models import Reservation
+from source.emails import send_captcha
+
 
 api = Blueprint('api', __name__)
 
@@ -41,8 +45,11 @@ class IndexAPI(MethodView):
 
 class UrlAPI(MethodView):
     def get(self, endpoint):
-        url = url_for(endpoint)
-        return url_schema(url)
+        try:
+            url = url_for(endpoint)
+            return url_schema(url)
+        except BuildError:
+            return jsonify({'url': None, 'message': 'Has no this endpoint.'})
 
 
 class GuidersAPI(MethodView):
@@ -63,10 +70,27 @@ class GuidersAPI(MethodView):
         return {'success': True}
 
 
+class EmailAPI(MethodView):
+    def post(self):
+        key = 'captcha'
+        if session.get(key):
+            session.pop(key)
+        email = request.json['email']
+        captcha = send_captcha(email)
+        session[key] = captcha
+        return {'success': True, 'message': '验证码已发送'}
+
+
 class ReservationAPI(MethodView):
     def get(self, item_id):
         reservation = Reservation.query.get_or_404(item_id)
         return reservation_schema(reservation)
+
+    def delete(self, item_id):
+        reservation = Reservation.query.get_or_404(item_id)
+        db.session.delete(reservation)
+        db.session.commit()
+        return jsonify({'success': True})
 
 
 class ReservationsAPI(MethodView):
@@ -87,8 +111,14 @@ class ReservationsAPI(MethodView):
         return reservations_schema(reservations)
 
     def post(self):
+        key = 'captcha'
         form_json = request.json
+        if not session.get(key):
+            return jsonify({'success': False, 'errors': {key: ['没有获取验证码或验证码已失效']}})
+        if form_json[key] != session.get(key):
+            return jsonify({'success': False, 'errors': {key: ['验证码错误']}})
         # print(form_json)
+        form_json.pop(key)
         form = ReservationForm(MultiDict(form_json))  # 使用 ReservationForm 进行表单验证
 
         if form.validate():  # 如果表单验证通过
@@ -104,6 +134,7 @@ class ReservationsAPI(MethodView):
                 num_peoples=data['num_peoples'],
                 explain=data['explain'],
                 notes=data['notes'],
+                email=data['email'],
                 time_submitted=now
             )
 
@@ -114,7 +145,7 @@ class ReservationsAPI(MethodView):
             form_json['time_submitted'] = str(now)
 
             emit('new_reservation', form_json, namespace='', broadcast=True)
-
+            session.pop(key)
             return jsonify({'success': True, 'message': '预约成功！'})
         else:
             # print(form.errors)
@@ -132,6 +163,10 @@ api.add_url_rule('/url/<string:endpoint>',
 api.add_url_rule('/guiders',
                  view_func=GuidersAPI.as_view('guiders'),
                  methods=['GET', 'POST'])
+
+api.add_url_rule('/send_captcha',
+                 view_func=EmailAPI.as_view('email'),
+                 methods=['POST'])
 
 api.add_url_rule('/reservation',
                  view_func=ReservationsAPI.as_view('reservations'),

@@ -1,8 +1,8 @@
 click~=8.1.7
-Flask~=3.0.0
+Flask~=2.3.3
 Flask_SocketIO~=5.3.6
 flask_sqlalchemy~=3.1.1
 Flask_WTF~=1.1.1
 SQLAlchemy~=2.0.21
-Werkzeug~=3.0.1
+Werkzeug~=2.3.7
 WTForms~=3.0.1

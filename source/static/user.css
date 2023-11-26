@@ -169,3 +169,8 @@ img {
     border: 3px #9fcdff;
     border-radius: 3px;
 }
+
+.revoke-btn {
+    width: 80%;
+    height: 60%;
+}
