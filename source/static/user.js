@@ -2,18 +2,20 @@ $(document).ready(function () {
     initPage();
     initDate();
     initTimeBar();
+    while (!initTime()) {
+        initDate();
+    }
     registerDateChange();
     registerCheckNumPeoples();
     registerSendCaptcha();
     registerFormSubmit();
-    initTime();
+
 })
 
 
 // 初始化日期选择条
-function initDate() {
+function initDate(offset=1) {
     let $date = $("#date");
-    let offset = 1;
     // while ([0, 6].includes((new Date(transToFormat(getDateStr(offset)))).getDay())) {
     //     offset += 1;
     // }
@@ -60,30 +62,31 @@ function initTimeBar() {
 
 // 初始选择第一个和时间段
 function initTime() {
-    selectTimeSegment($(".time-segment")
-        .filter(function () {
-            return !$(this).hasClass("reserved") && !$(this).hasClass("unable");
-        }).first());
+    let istTimeSeg = $(".time-segment").filter(function () {
+        return !$(this).hasClass("reserved") && !$(this).hasClass("unable");
+    }).first();
+    return selectTimeSegment(istTimeSeg);
 }
 
 
 // 方框选择时间段
 function selectTimeSegment($selectedElement) {
     if (!$selectedElement) {
-        return;
+        return false;
     }
     if ($selectedElement.hasClass("reserved")) {
         flash("该场次已被预订", $selectedElement);
-        return;
+        return false;
     } else if ($selectedElement.hasClass("unable")) {
         flash("该场次不提供服务，抱歉", $selectedElement);
-        return;
+        return false;
     } else {
         $('.time-segment').removeClass("selected");
         $selectedElement.addClass("selected");
         $('#selectedTime').val($($selectedElement).val());
     }
     refreshExplain();
+    return true;
 }
 
 
@@ -397,21 +400,36 @@ function showResults() {
                 const records = data["reservations"];
                 records.forEach(record => {
                     // Create and append table rows
-                    let btnHtml = '';
-                    if (new Date(record.date) < today) {
-                        btnHtml = '<td><button class="btn btn-mini revoke-btn" disabled>已过期</button></td>';
+                    let $btn = null;
+
+                    if (new Date(record.date) >= today) {
+                        $btn = $(`<button class="btn btn-mini revoke-btn" value=${record.id}>撤回预约</button>`);
+                        $btn.click(() => {
+                            if (confirm("你确定要撤销此次预约？")) {
+                                urlfor("api.reservations").then(url => {$.ajax({
+                                    type: "DELETE",
+                                    url: url + '/' + $btn.val(),
+                                    contentType: "application/json",
+                                    success: function (response) { if (response.success) {
+                                        flash("已成功撤销");
+                                        $(`#res-tr-${$btn.val()}`).remove();
+                                    }}
+                                })})
+                            }
+                        })
                     } else {
-                        btnHtml = '<td><button class="btn btn-mini revoke-btn">撤回预约</button></td>'
+                        $btn = $('<button class="btn btn-mini revoke-btn" disabled>已过期</button>');
                     }
                     dataRows.append(`
-                        <tr>
+                        <tr id="res-tr-${$btn.val()}">
                             <td>${formatDateToCustomFormat(record.date).slice(5)}</td>
                             <td>${record.time}</td>
                             <td>${record.num_peoples}</td>
                             <td>${record.explain ? "是" : "否"}</td>
-                            ${btnHtml}
+                            <td></td>
                         </tr>
                     `);
+                    dataRows.find('tr:last-child td:last-child').append($btn);
                 })
             }
         })
@@ -473,10 +491,10 @@ function initPage() {
             </div>
             <div class="form-group row">
                 <label for="captcha" class="col-sm-12 col-form-label">邮箱验证码：</label>
-                <div class="col-sm-8">
+                <div class="col-sm-8 col-12"><!-- 使用 col-12 类 -->
                     <input type="text" class="form-control" id="captcha" name="captcha" required placeholder="请输入验证码">
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-4 col-12"><!-- 使用 col-12 类 -->
                     <button type="button" class="btn btn-primary" id="captcha-btn">获取验证码</button>
                 </div>
             </div>

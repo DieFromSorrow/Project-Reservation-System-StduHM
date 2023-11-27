@@ -202,3 +202,7 @@ td {
 .compact-table tbody td {
   border-top: 1px solid #dee2e6; /* 添加细边框，增加分隔线 */
 }
+
+#captcha {
+    margin-bottom: 20px;
+}

@@ -173,4 +173,4 @@ api.add_url_rule('/reservation',
 
 api.add_url_rule('/reservation/<int:item_id>',
                  view_func=ReservationAPI.as_view('reservation'),
-                 methods=['GET'])
+                 methods=['GET', 'DELETE'])

@@ -1,4 +1,4 @@
-function urlfor(endpoint, params = {}) {
+function urlfor(endpoint, params = null) {
     let baseApi = "/api/v1/url/";
     return new Promise(function (resolve, reject) {
         $.ajax({
@@ -7,7 +7,7 @@ function urlfor(endpoint, params = {}) {
             contentType: "application/json",
             success: function (data) {
                 let url = data["url"];
-                if (params !== {}) {
+                if (params) {
                     url += '?' + objectToQueryString(params);
                 }
                 resolve(url);
