@@ -241,7 +241,7 @@ function countdownButton($btn, seconds) {
     let originalText = $btn.text();
 
     function updateButtonText(seconds) {
-        $btn.text(seconds + 's 后可再次点击');
+        $btn.text(seconds + 's');
     }
 
     updateButtonText(seconds);
@@ -370,7 +370,7 @@ function showResults() {
     const container = $("#container");
     container.html(`<h2>预约结果</h2>
         <!-- Table to Display Data -->
-        <table class="table table-bordered">
+        <table class="table table-bordered compact-table">
             <thead>
             <tr>
                 <th class="th-left">日期</th>
@@ -399,9 +399,9 @@ function showResults() {
                     // Create and append table rows
                     let btnHtml = '';
                     if (new Date(record.date) < today) {
-                        btnHtml = '<td><button id="revoke-btn" class="btn btn-primary btn-small" disabled>已过期</button></td>';
+                        btnHtml = '<td><button class="btn btn-mini revoke-btn" disabled>已过期</button></td>';
                     } else {
-                        btnHtml = '<td><button id="revoke-btn" class="btn btn-primary btn-small">撤回预约</button></td>'
+                        btnHtml = '<td><button class="btn btn-mini revoke-btn">撤回预约</button></td>'
                     }
                     dataRows.append(`
                         <tr>
@@ -428,7 +428,7 @@ function initPage() {
         </div>`
     const tips = `
         <div class="alert align-baseline">
-            <strong>温馨提示：<br /></strong>
+            <strong id="tip">温馨提示：</strong>
             <p class="add-indent small">为精准提供校史馆讲解服务，暂定校史馆周一、周二、周四下午，周三、周五全天内的指定时段提供讲解服务。
                （寒暑假及法定节假日另行通知）为保障参观安全及效果，每批参观人数建议不超40人。
             </p>
@@ -436,7 +436,7 @@ function initPage() {
     const form = `
         <form id="reservationForm">
             <div class="form-group">
-                <label for="name">姓名：</label>
+                <label for="name" class="label">姓名：</label>
                 <input type="text" class="form-control" id="name" required placeholder="请输入姓名">
             </div>
             <div class="form-group">

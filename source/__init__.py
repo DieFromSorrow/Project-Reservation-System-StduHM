@@ -8,7 +8,6 @@ from source.extensions import mail
 from source.forms import ReservationForm
 from source.models import Reservation
 from source.settings import Config, DevelopmentConfig
-from datetime import timedelta
 
 
 def create_app(config=DevelopmentConfig):

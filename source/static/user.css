@@ -171,6 +171,34 @@ img {
 }
 
 .revoke-btn {
-    width: 80%;
-    height: 60%;
+    font-size: small;
+}
+
+#tip {
+    padding-bottom: 0;
+    /* 其他样式属性，如 top、left、width、margin 等 */
+}
+
+td {
+    padding: 0;
+}
+
+/* 自定义 CSS 样式，用于调整表格的紧凑性 */
+.compact-table {
+  margin-bottom: 0; /* 去除表格底部的外边距 */
+}
+
+.compact-table th,
+.compact-table td {
+  padding: 0.5rem; /* 调整单元格内边距 */
+  font-size: 0.9rem; /* 调整字体大小 */
+}
+
+.compact-table thead th {
+  vertical-align: middle; /* 调整表头文本垂直对齐 */
+}
+
+.compact-table tbody th,
+.compact-table tbody td {
+  border-top: 1px solid #dee2e6; /* 添加细边框，增加分隔线 */
 }
