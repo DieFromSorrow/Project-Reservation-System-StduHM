@@ -4,9 +4,9 @@ $(document).ready(function () {
     registerSubmit();
 });
 
-function checkKey() {
-    let key = "secret_key"; // 这是你的密匙
+function checkKey(key) {
     let userInput = prompt("请输入密匙："); // 弹出一个输入框，让用户输入字符串
+    if (userInput === null) { return null; }
     return userInput === key;
 }
 
@@ -37,30 +37,40 @@ function registerSubmit() {
     $('#jsonForm').submit(function (event) {
         event.preventDefault();
         let jsonData = $('#jsonData').val();
-        if (checkKey()) {
-            urlfor("api.guiders")
-                .then(function (url) {
-                    $.ajax({
-                        type: "POST",
-                        url: url,
-                        data: jsonData,
-                        contentType: "application/json",
-                        success: function (message) {
-                            // Populate the textarea with the JSON data
-                            alert("Success!");
-                        },
-                        error: function (error) {
+        urlfor("admin_password").then(url => {$.ajax({
+            type: "INTERNAL",
+            url: url,
+            contentType: "application/jon",
+            success: function (response) {
+                let res = checkKey(response.password)
+                if (res) {
+                    urlfor("api.guiders")
+                        .then(function (url) {
+                            $.ajax({
+                                type: "POST",
+                                url: url,
+                                data: jsonData,
+                                contentType: "application/json",
+                                success: function (message) {
+                                    // Populate the textarea with the JSON data
+                                    if (message.success) {
+                                        alert("Success!");
+                                    }
+                                },
+                                error: function (error) {
+                                    console.error(error);
+                                }
+                            });
+                        })
+                        .catch(function (error) {
                             console.error(error);
-                        }
-                    });
-                })
-                .catch(function (error) {
-                    console.error(error);
-                });
-        }
-        else {
-            alert("密匙错误");
-        }
+                        });
+                }
+                else {
+                    if (res === false) alert("密匙错误");
+                }
+            }
+        })})
     });
 }
 

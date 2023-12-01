@@ -37,6 +37,10 @@ def register_blueprints(app: Flask):
     def guider():
         return render_template('guiders.html')
 
+    @app.route('/admin_password', methods=['INTERNAL'])
+    def admin_password():
+        return {'success': True, 'password': app.config.get('ADMIN_PASSWORD')}
+
     app.register_blueprint(api, url_prefix='/api/v1')
 
 

@@ -140,7 +140,7 @@ class ReservationsAPI(MethodView):
             db.session.add(reservation)
             db.session.commit()
 
-            form_json['id'] = Reservation.query.order_by(desc(Reservation.id)).first().id
+            form_json['id'] = reservation.id
             form_json['time_submitted'] = str(now)
 
             emit('new_reservation', form_json, namespace='', broadcast=True)

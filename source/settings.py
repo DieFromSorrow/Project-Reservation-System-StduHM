@@ -24,6 +24,8 @@ class Config:
     PASSWORD = os.getenv('DB_PASSWORD')
     DB_URI = 'mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8'.format(USERNAME, PASSWORD, HOSTNAME, PORT, DATABASE)
     SQLALCHEMY_DATABASE_URI = DB_URI
+
+    ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD')
     pass
 
 

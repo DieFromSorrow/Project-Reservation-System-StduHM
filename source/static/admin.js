@@ -1,9 +1,24 @@
+/**/
 const endpoint = "api.reservations"; // Update with your actual API endpoint
 let min_id = null;
 
 $(document).ready(function () {
+    let admin_input = prompt("请输入密匙：");
+    if (admin_input === null) {} else {
+        urlfor("admin_password").then(url => {$.ajax({
+            type: "INTERNAL",
+            url: url,
+            contentType: "application/jon",
+            success: function (response) {
+                if (admin_input === response.password) x();
+                else alert("密匙错误");
+            }
+        })})
+    }
+});
 
-    let limit = 10;
+function x() {
+    let limit = 20;
     // Initial web page
     initPage();
 
@@ -33,8 +48,7 @@ $(document).ready(function () {
         console.log('New data:', data);
         putNewRecord(data)
     });
-
-});
+}
 
 
 function putNewRecord(record) {
