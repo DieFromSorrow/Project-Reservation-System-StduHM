@@ -2,6 +2,7 @@
 const endpoint = "api.reservations"; // Update with your actual API endpoint
 let min_id = null;
 
+
 $(document).ready(function () {
     let admin_input = prompt("请输入密匙：");
     if (admin_input === null) {} else {
@@ -17,6 +18,7 @@ $(document).ready(function () {
     }
 });
 
+
 function x() {
     let limit = 20;
     // Initial web page
@@ -30,6 +32,10 @@ function x() {
         loadRecords(limit, min_id, false);
     });
 
+    $("#refreshBtn").click(function () {
+        loadRecords(limit, null, true);
+    })
+
     // Filtering logic
     $(".form-control").each((idx, elem) => {
         $(elem).change(function () {
@@ -37,7 +43,7 @@ function x() {
         })
     });
 
-    let socket = io()
+    let socket = io();
 
     socket.on('connect', function () {
         console.log('Connected to the server');
@@ -200,7 +206,8 @@ function initPage() {
         </table>`;
     const loadMoreBtn = `
         <!-- Load More Button -->
-        <button class="btn btn-primary" id="loadMoreBtn">加载更多</button>`;
+        <button class="btn btn-primary" id="loadMoreBtn">加载更多</button>
+        <button class="btn btn-primary" id="refreshBtn">刷新数据</button>`;
     const modal = `
         <!-- 模态框 -->
         <div class="modal" id="text-modal">

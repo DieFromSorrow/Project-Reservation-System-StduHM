@@ -9,7 +9,6 @@ $(document).ready(function () {
     registerCheckNumPeoples();
     registerSendCaptcha();
     registerFormSubmit();
-
 })
 
 
@@ -263,11 +262,19 @@ function countdownButton($btn, seconds) {
 
 
 function registerSendCaptcha() {
-    $("#captcha-btn").click(function () {
-        let email = $("#email").val();
+    const $btn = $("#captcha-btn");
+    $btn.click(function () {
+        const $email = $("#email");
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        let email = $email.val();
         if (!email) {
             flash("请先填写电子邮箱");
+        } else if (!emailRegex.test($email.val())) {
+            flash("邮箱格式错误");
         } else {
+            $btn.prop('disabled', true);
+            $btn.text('验证码发送中');
             urlfor("api.email").then(url => {
                 $.ajax({
                     type: 'POST',
@@ -277,10 +284,10 @@ function registerSendCaptcha() {
                     success: function (response) {
                         if (response.success) {
                             flash(response.message);
-                            countdownButton($("#captcha-btn"), 60);
+                            countdownButton($btn, 60);
                         } else {
                             flash(response.message);
-                            countdownButton($("#captcha-btn"), 1);
+                            $btn.prop('disabled', false);
                         }
                     }
                 })
